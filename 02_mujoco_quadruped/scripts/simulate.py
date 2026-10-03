@@ -1,11 +1,27 @@
 import mujoco
 import time
 
-model = mujoco.MjModel.from_xml_path(
-    "../model/flat_scene.xml"
-)
+from pathlib import Path
+
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+XML_PATH = SCRIPT_DIR.parent / "model" / "flat_scene.xml"
+
+model = mujoco.MjModel.from_xml_path(str(XML_PATH))
 
 data = mujoco.MjData(model)
+
+import mujoco
+
+for i in range(model.njnt):
+    print("joint:", i, mujoco.mj_id2name(
+        model, mujoco.mjtObj.mjOBJ_JOINT, i))
+
+print("-----")
+
+for i in range(model.nu):
+    print("actuator:", i, mujoco.mj_id2name(
+        model, mujoco.mjtObj.mjOBJ_ACTUATOR, i))
 
 print("nq =", model.nq)
 print("nv =", model.nv)
