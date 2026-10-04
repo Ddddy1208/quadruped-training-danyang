@@ -26,6 +26,7 @@
 3. 仿真优化
 采用物理仿真步与渲染步分离方案，高频运行物理迭代、低频画面渲染，解决原生同步渲染导致的慢动作、仿真卡顿问题，保证物理时序精准的同时提升仿真流畅度。
 六、运行方式
+pip install -r requirements.txt
 进入项目脚本目录，直接运行仿真脚本：
 cd 02_mujoco_quadruped/scripts
 python3 simulate.py

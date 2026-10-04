@@ -10,6 +10,8 @@
 
 ## 运行
 ```bash
+pip install -r requirements.txt
+
 cd 02_mujoco_quadruped/scripts
 python3 simulate.py
 
