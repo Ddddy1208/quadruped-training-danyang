@@ -1,4 +1,23 @@
+# Python
 __pycache__/
 *.pyc
+.venv/
+
+# C/C++ build
+build/
+cmake-build-*/
+*.o
+*.a
+
+# IDE
 .vscode/
-.DS_Store
+.idea/
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Large generated artifacts
+*.bag
+*.pt
+*.pth
