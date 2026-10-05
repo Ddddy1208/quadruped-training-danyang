@@ -14,26 +14,24 @@ else()
 endif()
 
 #example
-add_executable(example_a1_motor example/example_a1_motor.cpp)
-target_link_libraries(example_a1_motor ${EXTRA_LIBS})
+add_executable(test2 example/test2.cpp)
+target_link_libraries(test2 ${EXTRA_LIBS})
 
-add_executable(example_a1_motor_output example/example_a1_motor_output.cpp)
-target_link_libraries(example_a1_motor_output ${EXTRA_LIBS})
+add_executable(test3 example/test3.cpp)
+target_link_libraries(test3 ${EXTRA_LIBS})
 
-add_executable(example_b1_motor example/example_b1_motor.cpp)
-target_link_libraries(example_b1_motor ${EXTRA_LIBS})
+add_executable(test4 example/test4.cpp)
+target_link_libraries(test4 ${EXTRA_LIBS})
 
 add_executable(example_goM8010_6_motor example/example_goM8010_6_motor.cpp)
 target_link_libraries(example_goM8010_6_motor ${EXTRA_LIBS})
 
-add_executable(example_goM8010_6_motor_test example/example_goM8010_6_motor_test.cpp)
-target_link_libraries(example_goM8010_6_motor_test ${EXTRA_LIBS})
 
-add_executable(changeID example/changeID.cpp)
-target_link_libraries(changeID ${EXTRA_LIBS})
+#add_executable(changeID example/changeID.cpp)
+#target_link_libraries(changeID ${EXTRA_LIBS})
 
 set(LIBRARY_OUTPUT_PATH "../lib")
-add_subdirectory(thirdparty/pybind11)
-pybind11_add_module(unitree_actuator_sdk thirdparty/python_wrapper/wrapper.cpp)
-target_link_libraries(unitree_actuator_sdk PRIVATE ${EXTRA_LIBS})
-set_target_properties(unitree_actuator_sdk PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}")
+#add_subdirectory(thirdparty/pybind11)
+#pybind11_add_module(unitree_actuator_sdk thirdparty/python_wrapper/wrapper.cpp)
+#target_link_libraries(unitree_actuator_sdk PRIVATE ${EXTRA_LIBS})
+#set_target_properties(unitree_actuator_sdk PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}")

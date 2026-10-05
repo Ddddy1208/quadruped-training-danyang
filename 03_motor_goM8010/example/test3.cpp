@@ -16,30 +16,27 @@ int main()
     const double N = queryGearRatio(TYPE);
     const double PI = 3.141592653589793;
 
+    // 输出端参数
     const double KP_OUT = 80.0;
     const double KD_OUT = 3.0;
 
+    // 转子侧参数
     const double KP = KP_OUT / (N * N);
     const double KD = KD_OUT / (N * N);
 
     const double DT = 0.002;
     const double MAX_SPEED = 10.0 * PI / 180.0;
 
-    // 第3步：新零点物理正向移动30°
-    const double BASE_OFFSET = -30.0 * PI / 180.0;
-
-    // 相邻候选零点在输出端的间距
-    const double ZERO_INTERVAL = 2.0 * PI / N;
-
-    // 第2步旧零点，在第3步新坐标系中应该是 -30°
-    const double STARTUP_EXPECTED = -30.0 * PI / 180.0;
+    // 新零点 = 旧零点物理正方向 30°
+    // 所以软件 offset = -30°
+    const double OFFSET = -30.0 * PI / 180.0;
 
     cmd.motorType = TYPE;
     data.motorType = TYPE;
     cmd.mode = queryMotorMode(TYPE, MotorMode::FOC);
     cmd.id = 0;
 
-    // 先只读取位置
+    // 先读取当前位置
     cmd.kp = 0.0;
     cmd.kd = 0.0;
     cmd.q = 0.0;
@@ -51,40 +48,22 @@ int main()
         usleep(2000);
     }
 
-    // 当前候选角度
-    double q_candidate = data.q / N + BASE_OFFSET;
+    // 转子侧反馈 -> 新的输出端坐标
+    double q_ref = data.q / N + OFFSET;
 
-    // 自动判断落到了哪个相邻零点
-    double zero_correction =
-        std::round(
-            (STARTUP_EXPECTED - q_candidate) / ZERO_INTERVAL
-        ) * ZERO_INTERVAL;
+    // 新坐标系中的目标
+    double target = 0.0;
 
-    double q_now =
-        data.q / N
-        + BASE_OFFSET
-        + zero_correction;
-
-    // 启动时目标直接设成当前位置，避免突然运动
-    double q_ref = q_now;
-    double target = q_now;
-
-    std::cout << "raw candidate = "
-              << q_candidate * 180.0 / PI
+    std::cout << "Current angle = "
+              << q_ref * 180.0 / PI
               << " deg" << std::endl;
 
-    std::cout << "zero correction = "
-              << zero_correction * 180.0 / PI
-              << " deg" << std::endl;
-
-    std::cout << "corrected angle = "
-              << q_now * 180.0 / PI
-              << " deg" << std::endl;
-
-    std::cout << "Input target angle (deg): " << std::endl;
+    std::cout << "New zero offset = +30 deg physically" << std::endl;
+    std::cout << "Returning to NEW 0 deg..." << std::endl;
 
     while (true)
     {
+        // 缓慢插值
         double error = target - q_ref;
         double step = MAX_SPEED * DT;
 
@@ -95,24 +74,19 @@ int main()
         else
             q_ref = target;
 
+        // 新输出端坐标 -> 转子侧
         cmd.kp = KP;
         cmd.kd = KD;
-
-        // 新坐标 -> 转子坐标
-        cmd.q =
-            (q_ref - BASE_OFFSET - zero_correction) * N;
-
+        cmd.q = (q_ref - OFFSET) * N;
         cmd.dq = 0.0;
         cmd.tau = 0.0;
 
         serial.sendRecv(&cmd, &data);
 
-        // 转子反馈 -> 修正后的输出端坐标
-        q_now =
-            data.q / N
-            + BASE_OFFSET
-            + zero_correction;
+        // 转子侧反馈 -> 新输出端坐标
+        double q_now = data.q / N + OFFSET;
 
+        // 检查键盘输入
         struct pollfd pfd;
         pfd.fd = STDIN_FILENO;
         pfd.events = POLLIN;
@@ -130,6 +104,11 @@ int main()
                     std::cout << "New target = "
                               << degree
                               << " deg" << std::endl;
+                }
+                else
+                {
+                    std::cout << "Please input -30 ~ 30 deg"
+                              << std::endl;
                 }
             }
         }
